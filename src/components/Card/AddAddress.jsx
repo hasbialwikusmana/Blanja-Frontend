@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { MdClose } from "react-icons/md";
-
 import api from "../../services/Api";
 import Swal from "sweetalert2";
 

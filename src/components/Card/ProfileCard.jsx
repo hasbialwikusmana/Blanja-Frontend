@@ -136,7 +136,7 @@ function ProfileCard() {
   };
 
   return (
-    <div className="w-full lg:w-2/3 p-4 lg:p-8">
+    <div className="w-3/4 p-8 mt-16">
       <div className="bg-white rounded-md border shadow-md p-6 mb-8 lg:min-h-screen">
         <h2 className="text-lg font-semibold mb-4">My Profile</h2>
         <p className="text-sm text-gray-600 mb-4">Manage your profile information</p>

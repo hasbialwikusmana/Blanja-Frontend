@@ -1,20 +1,38 @@
-import { FaStar } from "react-icons/fa";
-import Navbar from "../../components/Navbar/Navbar";
-import { Link, useParams } from "react-router-dom";
 import Footer from "../../components/Footer/Footer";
-import api from "../../services/Api";
 import { useEffect, useState } from "react";
+import api from "../../services/Api";
+import Navbar from "../../components/Navbar/Navbar";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { FaFilter, FaStar } from "react-icons/fa";
 
 function Category() {
-  const [category, setCategory] = useState([]);
-  const [sortby, setSortBy] = useState("product_name");
-  const [sort, setSort] = useState("asc");
-  const { id } = useParams();
+  const [categories, setCategories] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [showFilter, setShowFilter] = useState(false);
+  const [sortby, setSortBy] = useState("");
+  const [sort, setSort] = useState("");
+  const [selectedTypes] = useState([]);
+  const { id } = useParams(); // Get the current category ID from URL
+  const navigate = useNavigate(); // Hook to programmatically navigate
+
+  useEffect(() => {
+    getCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     getProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, sortby, sort]);
+  }, [sortby, sort, selectedTypes, id]); // Added id dependency
+
+  const getCategories = async () => {
+    try {
+      const response = await api.get(`/category`);
+      setCategories(response.data.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const getProducts = async () => {
     try {
@@ -22,55 +40,92 @@ function Category() {
         params: {
           sortby,
           sort,
+          types: selectedTypes.join(","),
         },
       });
-
-      setCategory(response.data.data);
+      setFilteredProducts(response.data.data);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
   };
 
-  const handleSortByChange = (event) => {
-    setSortBy(event.target.value);
+  const handleSortByChange = (e) => {
+    setSortBy(e.target.value);
   };
 
-  const handleSortOrderChange = (event) => {
-    setSort(event.target.value);
+  const handleSortOrderChange = (e) => {
+    setSort(e.target.value);
+  };
+
+  const handleCategoryChange = (categoryId) => {
+    // Update the URL parameter to the selected category ID
+    navigate(`/products/category/${categoryId}`);
   };
 
   return (
     <>
       <Navbar />
-      <div className="container w-4/5 mx-auto py-8">
-        <div className="text-sm text-gray-600 mb-10">Home &gt; Category &gt; {category[0]?.category_name || "Loading..."}</div>
-        <div>
-          <h2 className="text-2xl font-bold mb-5">{category[0]?.category_name || "Loading..."}</h2>
+      <div className="w-4/5 mx-auto pt-32">
+        {/* Breadcrumb */}
+        <div className="text-sm text-gray-600 mb-6">Home &gt; Category &gt; {categories.find((cat) => cat.id === id)?.name || "Loading..."}</div>
 
+        {/* Main Container */}
+        <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 border-gray-200">
           {/* Category Filter */}
-          <div className="flex justify-between mb-5">
-            <div className="flex items-center">
-              <label className="mr-2">Sort by:</label>
-              <select value={sortby} onChange={handleSortByChange} className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-primary">
-                <option value="product_name">Name</option>
-                <option value="price">Price</option>
-              </select>
-            </div>
-            <div className="flex items-center">
-              <label className="mr-2">Order:</label>
-              <select value={sort} onChange={handleSortOrderChange} className="border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-primary">
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
-              </select>
+          <div className="w-full sm:w-1/4 min-w-60">
+            {/* Filter Toggle for Smaller Screens */}
+            <p onClick={() => setShowFilter(!showFilter)} className="text-lg font-semibold flex items-center cursor-pointer gap-2 mb-4 sm:hidden">
+              Filter
+              <FaFilter size={20} className={`transform transition-transform ${showFilter ? "rotate-180" : ""}`} />
+            </p>
+
+            {/* Filter Section */}
+            <div className={`border border-gray-300 p-4 bg-white shadow-md rounded-lg ${showFilter ? "" : "hidden"} sm:block`}>
+              <p className="text-sm font-semibold text-gray-900 mb-4">Filter</p>
+              <div className="flex flex-col gap-3 text-sm text-gray-700">
+                {categories.map((cat) => (
+                  <label key={cat.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      className="form-checkbox h-4 w-4 text-primary"
+                      type="checkbox"
+                      value={cat.id}
+                      onChange={() => handleCategoryChange(cat.id)}
+                      checked={id === cat.id} // Ensure checkbox reflects the selected category ID
+                    />
+                    <span>{cat.name}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-            {category.length > 0 ? (
-              category.map((product) => (
-                <Link key={product.id} to={`/product/${product.id}`}>
-                  <div className="bg-white shadow-lg hover:shadow-xl rounded-lg overflow-hidden transform transition duration-300 hover:scale-105">
+          {/* Content Area (e.g., Product List) */}
+          <div className="flex-1">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+              <h2 className="text-2xl font-bold text-gray-900">{categories.find((cat) => cat.id === id)?.name || "Loading..."}</h2>
+
+              {/* Sorting Dropdown */}
+              <div className="flex gap-4">
+                <select value={sortby} onChange={handleSortByChange} className="border border-gray-300 rounded-md text-sm px-4 py-2 bg-white focus:outline-none focus:border-primary">
+                  <option value="">Sort By</option>
+                  <option value="product_name">Name</option>
+                  <option value="price">Price</option>
+                </select>
+
+                {/* Order Direction Dropdown */}
+                <select value={sort} onChange={handleSortOrderChange} className="border border-gray-300 rounded-md text-sm px-4 py-2 bg-white focus:outline-none focus:border-primary">
+                  <option value="">Order</option>
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Product Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 gap-y-6">
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <Link to={`/product/${product.id}`} key={product.id} className="bg-white shadow-md hover:shadow-lg rounded-lg overflow-hidden">
                     <img className="w-full h-40 object-cover object-center" src={product.photo} alt={product.product_name} />
                     <div className="p-4">
                       <h3 className="text-gray-900 font-semibold text-lg">{product.product_name}</h3>
@@ -85,30 +140,18 @@ function Category() {
                         <span className="text-gray-600 text-sm">(5)</span>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))
-            ) : (
-              <p>No products found.</p>
-            )}
+                  </Link>
+                ))
+              ) : (
+                <p>No products found.</p>
+              )}
+            </div>
+
+            {/* Pagination */}
           </div>
-
-          {/* Pagination */}
-          {/* <div className="flex justify-center items-center space-x-2">
-            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l">
-              <i className="fas fa-chevron-left"></i> Prev
-            </button>
-
-            <span className="text-gray-800 font-bold">
-              Page {currentPage} of {totalPages}
-            </span>
-
-            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">
-              Next <i className="fas fa-chevron-right"></i>
-            </button>
-          </div> */}
         </div>
       </div>
+
       <Footer />
     </>
   );

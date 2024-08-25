@@ -29,14 +29,25 @@ function ProfileSellerCard() {
         });
 
         const existingData = selersResponse.data.data;
-        setFormData({
-          name: existingData.name || "",
-          email: existingData.email || "",
-          phone: existingData.phone || "",
-          store_name: existingData.store_name || "",
-          store_description: existingData.store_description || "",
-          photo: existingData.photo || "",
-        });
+
+        // Check if existingData is not null or undefined
+        if (existingData) {
+          setFormData({
+            name: existingData.name || "",
+            email: existingData.email || "",
+            phone: existingData.phone || "",
+            store_name: existingData.store_name || "",
+            store_description: existingData.store_description || "",
+            photo: existingData.photo || "",
+          });
+        } else {
+          // Handle the case where data is null or undefined
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Profile data is missing.",
+          });
+        }
       } catch (error) {
         console.error(error);
         if (error.response && error.response.status === 403) {
@@ -125,7 +136,7 @@ function ProfileSellerCard() {
           text: "Profile updated successfully",
         });
 
-        setFormData(response.data.data);
+        setFormData(response.data?.data || formData);
       }
     } catch (error) {
       console.error(error);
@@ -141,8 +152,8 @@ function ProfileSellerCard() {
 
   return (
     <>
-      <div className="w-3/4 p-8">
-        <div className="bg-white rounded-md border shadow-md p-6  h-screen">
+      <div className="w-3/4 p-8 mt-16">
+        <div className="bg-white rounded-md border shadow-md p-6">
           {/* Form Data Profil */}
           <h2 className="text-lg font-semibold mb-4">My profile store</h2>
           <p className="text-sm text-gray-600 mb-4">Manage your profile information</p>

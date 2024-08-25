@@ -8,7 +8,7 @@ function MyOrder() {
     <>
       <Navbar />
 
-      <div className="flex bg-[#F5F5F5] pt-1">
+      <div className="flex pt-1">
         <SidebarCustomer />
         <MyOrderCard />
       </div>

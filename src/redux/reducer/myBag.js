@@ -44,6 +44,13 @@ const myBagReducer = (state = initialState, action) => {
         ...state,
         checkoutItems: state.myBag,
       };
+
+    case "REMOVE_ALL_FROM_MYBAG":
+      return {
+        ...state,
+        myBag: [],
+        checkoutItems: [],
+      };
     default:
       return state;
   }

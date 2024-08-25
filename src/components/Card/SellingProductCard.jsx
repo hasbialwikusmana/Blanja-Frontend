@@ -86,7 +86,7 @@ const SellingProductCard = () => {
   };
   return (
     <>
-      <div className="w-3/4">
+      <div className="w-3/4 mt-16">
         {/* Inventory 1 */}
         <div className="w-11/12 p-8">
           <div className="bg-white rounded-md border shadow-md p-6">

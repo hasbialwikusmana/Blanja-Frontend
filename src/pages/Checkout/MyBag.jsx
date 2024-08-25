@@ -75,7 +75,7 @@ function MyBag() {
   return (
     <>
       <Navbar />
-      <div className="container w-11/12 md:w-5/6 mx-auto py-8">
+      <div className="container w-11/12 md:w-5/6 mx-auto py-8 pt-32">
         {/* My Bag */}
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">My Bag</h2>
@@ -149,7 +149,11 @@ function MyBag() {
                     <p className="text-md font-semibold text-black">{formatCurrency(totalPrice)}</p>
                   </div>
                   {/* Button Buy */}
-                  <button onClick={handleCheckout} className="w-full px-4 py-2 text-white bg-primary rounded-full hover:bg-opacity-90 transition-all duration-200 ease-in-out">
+                  <button
+                    onClick={handleCheckout}
+                    className={`w-full px-4 py-2 text-white bg-primary rounded-full hover:bg-opacity-90 transition-all duration-200 ease-in-out ${myBag.myBag.length === 0 ? "cursor-not-allowed opacity-50" : ""}`}
+                    disabled={myBag.myBag.length === 0}
+                  >
                     Buy
                   </button>
                 </div>

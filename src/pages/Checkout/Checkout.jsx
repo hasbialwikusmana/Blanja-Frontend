@@ -372,22 +372,186 @@
 
 // export default Checkout;
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import Modal from "react-modal";
 import Footer from "../../components/Footer/Footer";
 import Navbar from "../../components/Navbar/Navbar";
+import AddAddress from "../../components/Card/AddressCard";
 import { formatCurrency } from "../../utils/formatCurrency";
-// const [openAddModal, setOpenAddModal] = useState({
-//       isShown: false,
-//       type: "add",
-//       data: null,
-//     });
-//     const [paymentModal, setPaymentModal] = useState({
-//       isShown: false,
-//       type: "payment",
-//       data: null,
-// });
+import api from "../../services/Api";
+import GopayIcon from "../../assets/img/payment/gopay.png";
+import PosIcon from "../../assets/img/payment/pos.png";
+import MasterCardIcon from "../../assets/img/payment/mastercard.png";
+import { MdClose } from "react-icons/md";
+import PropTypes from "prop-types";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+
+function SelectPayment({ onClose, checkoutItems, addressPrimary, formattedDeliveryCost, formattedTotalPrice, formattedTotalPriceWithDelivery }) {
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+  const handleOrderCreation = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+
+      const orderItems = checkoutItems.map((item) => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        seller_id: item.seller_id,
+      }));
+
+      const orderData = {
+        items: orderItems,
+        status: "pending",
+        payment_method: paymentMethod,
+        address_id: addressPrimary?.id,
+      };
+
+      await api.post("/orders", orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      dispatch({ type: "REMOVE_ALL_FROM_MYBAG" });
+      // Show success message and redirect
+      Swal.fire({
+        icon: "success",
+        title: "Order created successfully",
+        text: "Thank you for your order!",
+        confirmButtonText: "Close",
+      }).then(() => {
+        navigate("/my-order");
+      });
+
+      onClose();
+    } catch (error) {
+      console.error("Error creating order:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: error.response.data.message,
+      });
+    }
+  };
+
+  return (
+    <>
+      <div className="relative">
+        <button className="w-10 h-10 rounded-full flex item-center justify-center absolute p-2 -top-1 hover:bg-slate-50" onClick={onClose}>
+          <MdClose className="text-xl text-slate-400" size={24} />
+        </button>
+
+        <h2 className="text-[22px] font-semibold text-left ml-10 mb-4">Payment</h2>
+
+        <hr className="border-2 mb-4" />
+
+        {/* Payment method */}
+        <div className="flex flex-col mb-4">
+          <h3 className="text-[16px] font-semibold mb-4">Payment method</h3>
+          {/* Gopay */}
+          <div className="flex items-center mb-4">
+            {/* Logo Gopay */}
+            <img src={GopayIcon} alt="Gopay Logo" className="w-20 h-auto mr-4" />
+            <div className="flex-1 text-center">
+              <span className="text-lg font-medium">Gopay</span>
+            </div>
+            <input type="checkbox" id="gopay" name="paymentMethod" value="gopay" onChange={(e) => setPaymentMethod(e.target.value)} className="form-checkbox accent-primary" checked={paymentMethod === "gopay"} />
+          </div>
+          {/* Pos Indonesia */}
+          <div className="flex items-center mb-4">
+            {/* Logo Pos Indonesia */}
+            <img src={PosIcon} alt="Pos Indonesia Logo" className="w-16 h-auto mr-4" />
+            <div className="flex-1 text-center">
+              <span className="text-lg font-medium">Pos Indonesia</span>
+            </div>
+            <input type="checkbox" id="posIndonesia" name="paymentMethod" value="posIndonesia" onChange={(e) => setPaymentMethod(e.target.value)} className="form-checkbox accent-primary" checked={paymentMethod === "posIndonesia"} />
+          </div>
+          {/* Mastercard */}
+          <div className="flex items-center mb-2">
+            {/* Logo Mastercard */}
+            <img src={MasterCardIcon} alt="Mastercard Logo" className="w-14 h-auto mr-4" />
+            <div className="flex-1 text-center">
+              <span className="text-lg font-medium">Mastercard</span>
+            </div>
+            <input type="checkbox" id="mastercard" name="paymentMethod" value="mastercard" onChange={(e) => setPaymentMethod(e.target.value)} className="form-checkbox accent-primary" checked={paymentMethod === "mastercard"} />
+          </div>
+        </div>
+
+        <hr className="border-2 mb-4" />
+
+        {/* Shopping summary */}
+        <div className="flex flex-col">
+          <h3 className="text-[16px] font-semibold mb-4">Shopping summary</h3>
+          {/* Order */}
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-medium text-[#9B9B9B]">Order</p>
+            <p className="font-semibold text-[#222222]">{formattedTotalPrice}</p>
+          </div>
+          {/* Delivery */}
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-medium text-[#9B9B9B]">Delivery</p>
+            <p className="font-semibold text-[#222222]">{formattedDeliveryCost}</p>
+          </div>
+        </div>
+
+        {/* Shopping summary */}
+        <hr className="border-2 mt-8 mb-4" />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="font-medium text-[16px] ">Total Amount</p>
+            <p className="font-semibold text-[18px] text-[#DB3022]">{formattedTotalPriceWithDelivery}</p>
+          </div>
+          {/* Button Buy */}
+          <div className="flex justify-end items-center">
+            <button className="bg-primary text-[14px] text-white font-medium px-14 py-2 rounded-full hover:bg-hoverPrimary" onClick={handleOrderCreation} disabled={!paymentMethod}>
+              Buy
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
 
 function Checkout() {
+  const [addressPrimary, setAddressPrimary] = useState(null);
+  const [openAddModal, setOpenAddModal] = useState({
+    isShown: false,
+    type: "add",
+    data: null,
+  });
+
+  const [paymentModal, setPaymentModal] = useState({
+    isShown: false,
+    type: "payment",
+    data: null,
+  });
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token found");
+        const response = await api.get("/address/primary-address", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setAddressPrimary(response.data.data);
+      } catch (error) {
+        console.error("Error fetching address:", error);
+      }
+    };
+
+    fetchAddress();
+  }, []);
+
   const checkoutItems = useSelector((state) => state.myBag.checkoutItems);
   const totalPrice = checkoutItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
   const deliveryCost = 5000;
@@ -400,41 +564,38 @@ function Checkout() {
   return (
     <>
       <Navbar />
-      <div className="container w-11/12 md:w-5/6 mx-auto py-8">
+      <div className="container w-11/12 md:w-5/6 mx-auto py-8 pt-32">
         <h2 className="text-2xl font-semibold mb-4">Checkout</h2>
 
         <div className="flex flex-wrap lg:flex-nowrap justify-between">
-          {/* Card Select All and Delete */}
+          {/* Shipping Address Section */}
           <div className="w-full lg:w-3/4 pr-0 md:pr-10">
             <div className="w-full mb-8">
-              <h5 className="text-sm font-semibold mb-4">Shipping Adress</h5>
+              <h5 className="text-sm font-semibold mb-4">Shipping Address</h5>
               <div className="bg-white rounded-lg shadow-md p-6 mb-4">
-                <p className="mb-4 font-semibold">Andreas Jane</p>
-                <p className="mb-4 text-gray-600">Perumahan Sapphire Mediterania, Wiradadi, Kec. Sokaraja, Kabupaten Banyumas, Jawa Tengah, 53181 [Tokopedia Note: blok c 16] Sokaraja, Kab. Banyumas, 53181</p>
-                <p>
-                  <button className="bg-transparent text-gray-600 border border-gray-600 rounded-full px-4 py-2 hover:bg-gray-100 focus:outline-none">Choose another address</button>
-                </p>
+                <p className="mb-4 font-semibold">{addressPrimary?.recipient_name}</p>
+                <p className="mb-4 text-gray-600">{addressPrimary?.address}</p>
+                <button onClick={() => setOpenAddModal({ isShown: true, type: "add", data: null })} className="bg-transparent text-gray-600 border border-gray-600 rounded-full px-4 py-2 hover:bg-gray-100 focus:outline-none">
+                  Choose another address
+                </button>
 
-                {/* <Modal
-                isOpen={openAddModal.isShown}
-                onRequestClose={() => {}}
-                style={{
-                  overlay: {
-                    backgroundColor: "rgba(0,0,0,0.2)",
-                  },
-                }}
-                contentLabel=""
-                className="w-[50%] h-3/4 bg-white rounded-md mx-auto mt-14 p-5 overflow-scroll"
-              >
-                <AddAddress
-                  onClose={() => {
-                    setOpenAddModal({ isShown: false, type: "add", data: null });
+                <Modal
+                  isOpen={openAddModal.isShown}
+                  onRequestClose={() => setOpenAddModal({ isShown: false, type: "add", data: null })}
+                  style={{
+                    overlay: {
+                      backgroundColor: "rgba(0,0,0,0.2)",
+                    },
                   }}
-                />
-              </Modal> */}
+                  contentLabel="Add Address Modal"
+                  className="w-[50%] max-h-3/4 rounded-md mx-auto mt-14 p-5 overflow-scroll"
+                >
+                  <AddAddress onClose={() => setOpenAddModal({ isShown: false, type: "add", data: null })} />
+                </Modal>
               </div>
             </div>
-            {/* Individual Bag Items */}
+
+            {/* Checkout Items Section */}
             <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
               {checkoutItems.map((item) => (
                 <div key={item.id} className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -457,20 +618,19 @@ function Checkout() {
             </div>
           </div>
 
-          {/* Card Shopping Summary and Total Price */}
+          {/* Shopping Summary Section */}
           <div className="w-full lg:w-1/3">
             <div className="mb-8">
-              {/* Total price */}
               <div className="bg-white rounded-lg shadow-md p-6 mb-4">
                 <h3 className="text-md font-semibold mb-4">Shopping Summary</h3>
 
-                {/* Total price */}
+                {/* Total Price */}
                 <div className="flex items-center justify-between mb-5">
                   <p className="text-sm text-gray-600">Order ({checkoutItems.length} items)</p>
                   <p className="text-md font-semibold text-black">{formattedTotalPrice}</p>
                 </div>
 
-                {/* Delivery */}
+                {/* Delivery Cost */}
                 <div className="flex items-center justify-between mb-4 border-gray-200">
                   <p className="text-sm text-gray-600">Delivery</p>
                   <p className="text-md font-semibold text-black">{formattedDeliveryCost}</p>
@@ -478,14 +638,39 @@ function Checkout() {
 
                 <div className="border-b-4 mb-4 border-gray-200"></div>
 
-                {/* Shopping summary */}
+                {/* Total Amount */}
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm text-black font-semibold">Total Amount</p>
                   <p className="text-lg font-semibold text-red-500">{formattedTotalPriceWithDelivery}</p>
                 </div>
 
-                {/* Button Payment */}
-                <button className="w-full px-4 py-2 text-white bg-primary rounded-full hover:bg-opacity-90 transition-all duration-200 ease-in-out">Select Payment</button>
+                {/* Payment Button */}
+                <div className="text-center">
+                  <button className="bg-primary text-white w-full px-4 py-2 rounded-full focus:outline-none hover:bg-hoverPrimary" onClick={() => setPaymentModal({ isShown: true, type: "payment", data: null })}>
+                    Select Payment
+                  </button>
+
+                  <Modal
+                    isOpen={paymentModal.isShown}
+                    onRequestClose={() => {}}
+                    style={{
+                      overlay: {
+                        backgroundColor: "rgba(0,0,0,0.2)",
+                      },
+                    }}
+                    contentLabel=""
+                    className="w-[30%] max-h-3/4 bg-white rounded-md mx-auto mt-[5rem] p-5 z-50"
+                  >
+                    <SelectPayment
+                      onClose={() => setPaymentModal({ isShown: false, type: "payment", data: null })}
+                      checkoutItems={checkoutItems}
+                      formattedTotalPrice={formattedTotalPrice}
+                      formattedDeliveryCost={formattedDeliveryCost}
+                      formattedTotalPriceWithDelivery={formattedTotalPriceWithDelivery}
+                      addressPrimary={addressPrimary}
+                    />
+                  </Modal>
+                </div>
               </div>
             </div>
           </div>
@@ -495,5 +680,17 @@ function Checkout() {
     </>
   );
 }
+
+// PropTypes
+SelectPayment.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  formattedDeliveryCost: PropTypes.string.isRequired,
+  formattedTotalPrice: PropTypes.string.isRequired,
+  formattedTotalPriceWithDelivery: PropTypes.string.isRequired,
+  checkoutItems: PropTypes.array.isRequired,
+  addressPrimary: PropTypes.shape({
+    id: PropTypes.string,
+  }),
+};
 
 export default Checkout;

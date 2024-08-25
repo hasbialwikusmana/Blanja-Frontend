@@ -7,12 +7,11 @@ function ProfileSeller() {
   return (
     <>
       <Navbar />
-
-      <div className="flex bg-[#F5F5F5] pt-1">
+      <div className="flex flex-col lg:flex-row pt-1 min-h-screen">
         <SidebarSeller />
+
         <ProfileSellerCard />
       </div>
-
       <Footer />
     </>
   );

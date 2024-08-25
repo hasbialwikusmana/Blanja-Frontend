@@ -69,8 +69,22 @@ function App() {
           />
 
           {/* Checkout */}
-          <Route path="/mybag" element={<MyBag />} />
-          <Route path="/checkout" element={<Checkout />} />
+          <Route
+            path="/mybag"
+            element={
+              <PrivateRoute>
+                <MyBag />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <PrivateRoute>
+                <Checkout />
+              </PrivateRoute>
+            }
+          />
 
           {/* Product */}
           <Route
@@ -109,11 +123,12 @@ function App() {
           />
 
           {/* Profile Seller */}
+
           <Route
             path="/profile-seller"
             element={
               <PrivateRoute>
-                <ProfileSeller />{" "}
+                <ProfileSeller />
               </PrivateRoute>
             }
           />

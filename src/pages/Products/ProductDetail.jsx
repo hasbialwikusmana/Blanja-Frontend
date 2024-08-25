@@ -1,4 +1,4 @@
-import { FaMinus, FaPlus, FaStar } from "react-icons/fa";
+import { FaCartPlus, FaMinus, FaPlus, FaStar, FaWhatsapp } from "react-icons/fa";
 import Navbar from "../../components/Navbar/Navbar";
 import gambar1 from "../../assets/img/products/1.png";
 import gambar2 from "../../assets/img/products/2.png";
@@ -6,7 +6,7 @@ import gambar3 from "../../assets/img/products/3.png";
 import gambar4 from "../../assets/img/products/4.png";
 import gambar5 from "../../assets/img/products/5.png";
 // import thumbnail1 from "../../assets/img/products/1.png";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Footer from "../../components/Footer/Footer";
 import { useEffect, useState } from "react";
 import api from "../../services/Api";
@@ -23,7 +23,7 @@ function ProductDetail() {
   const { id } = useParams();
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     // Function to fetch product by ID
@@ -75,9 +75,9 @@ function ProductDetail() {
     setQuantity((prevQuantity) => prevQuantity + 1);
   };
 
-  const handleCheckout = () => {
-    navigate("/checkout", { state: { productId: product.id, quantity } });
-  };
+  // const handleCheckout = () => {
+  //   navigate("/checkout", { state: { product } });
+  // };
 
   const handleAddToBag = () => {
     dispatch({ type: "ADD_TO_MYBAG", payload: { ...product, quantity } });
@@ -88,7 +88,7 @@ function ProductDetail() {
       <Navbar />
 
       {/* Product Detail */}
-      <div className="container w-4/5 mx-auto py-8">
+      <div className="container w-4/5 mx-auto pb-8 pt-32">
         {/* Breadcrumbs */}
         <div className="text-sm text-gray-600 mb-10">Home &gt; Category &gt; {product?.category_name}</div>
 
@@ -152,13 +152,17 @@ function ProductDetail() {
 
             {/* Buttons */}
             <div className="flex mb-4">
-              <button className="w-1/2 border border-primary text-primary px-4 py-2 rounded-full mr-4 focus:outline-none hover:text-white hover:bg-primary">Chat</button>
-              <button className="w-1/2 border border-primary text-primary px-4 py-2 rounded-full mr-4 focus:outline-none hover:text-white hover:bg-primary" onClick={handleAddToBag}>
+              <button className="w-1/2 border border-primary text-primary px-4 py-2 rounded-full mr-4 focus:outline-none hover:text-white hover:bg-primary">
+                <FaWhatsapp className="inline-block mr-2" />
+                Chat
+              </button>
+              <button className="w-1/2 border bg-primary text-white  px-4 py-2 rounded-full mr-4 focus:outline-none hover:bg-hoverPrimary " onClick={handleAddToBag}>
+                <FaCartPlus className="inline-block mr-2" />
                 Add Bag
               </button>
-              <button onClick={handleCheckout} className="w-1/3 bg-primary text-white px-4 py-2 rounded-full focus:outline-none hover:bg-hoverPrimary">
+              {/* <button onClick={handleCheckout} className="w-1/3 bg-primary text-white px-4 py-2 rounded-full focus:outline-none hover:bg-hoverPrimary">
                 Buy Now
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -255,8 +259,8 @@ function ProductDetail() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
             {products.map((product) => (
               <Link key={product.id} to={`/product/${product.id}`}>
-                <div className="bg-white shadow-lg hover:shadow-xl rounded-lg overflow-hidden transform transition duration-300 hover:scale-105">
-                  <img className="w-full h-40 object-cover object-center" src={product.photo} alt={product.product_name} />
+                <div className="bg-white shadow-lg hover:shadow-xl rounded-lg overflow-hidden">
+                  <img className="w-full h-40 object-cover object-center hover:scale-110 transition ease-in-out" src={product.photo} alt={product.product_name} />
                   <div className="p-4">
                     <h3 className="text-gray-900 font-semibold text-lg">{product.product_name}</h3>
                     <p className="mt-1 text-gray-700 text-sm">{product.category_name}</p>

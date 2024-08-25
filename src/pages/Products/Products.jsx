@@ -28,8 +28,8 @@ const Products = () => {
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
           {products.map((product) => (
             <Link key={product.id} to={`/product/${product.id}`}>
-              <div className="bg-white shadow-lg hover:shadow-xl rounded-lg overflow-hidden transform transition duration-300 hover:scale-105">
-                <img className="w-full h-40 sm:h-48 object-cover object-center" src={product.photo} alt={product.product_name} />
+              <div className="bg-white shadow-lg hover:shadow-xl rounded-lg overflow-hidden ">
+                <img className="w-full h-40 sm:h-48 object-cover object-center hover:scale-110 transition ease-in-out" src={product.photo} alt={product.product_name} />
                 <div className="p-4">
                   <h3 className="text-gray-900 font-semibold text-base sm:text-lg md:text-xl lg:text-lg">{product.product_name}</h3>
                   <p className="mt-1 text-gray-700 text-sm">{product.category_name}</p>
@@ -54,8 +54,8 @@ const Products = () => {
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
           {products.map((product) => (
             <Link key={product.id} to={`/product/${product.id}`}>
-              <div className="bg-white shadow-lg hover:shadow-xl rounded-lg overflow-hidden transform transition duration-300 hover:scale-105">
-                <img className="w-full h-40 sm:h-48 object-cover object-center" src={product.photo} alt={product.product_name} />
+              <div className="bg-white shadow-lg hover:shadow-xl rounded-lg overflow-hidden ">
+                <img className="w-full h-40 sm:h-48 object-cover object-center hover:scale-110 transition ease-in-out" src={product.photo} alt={product.product_name} />
                 <div className="p-4">
                   <h3 className="text-gray-900 font-semibold text-base sm:text-lg md:text-xl lg:text-lg">{product.product_name}</h3>
                   <p className="mt-1 text-gray-700 text-sm">{product.category_name}</p>

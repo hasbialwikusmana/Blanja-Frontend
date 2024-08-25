@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import NoOrderImage from "../../assets/img/order/2.png";
-import { FaSearch, FaTrash } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import api from "../../services/Api";
-import { FaPencil } from "react-icons/fa6";
 import Swal from "sweetalert2";
+import { formatCurrency } from "../../utils/formatCurrency";
+import { HiPencilAlt, HiTrash } from "react-icons/hi";
 
 const ITEMS_PER_PAGE = 5; // Number of items per page
 
@@ -13,6 +14,18 @@ const MyProductCard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    api
+      .get("/category")
+      .then((response) => {
+        setCategories(response.data.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -85,26 +98,33 @@ const MyProductCard = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    const updatedProduct = {
-      product_name: e.target.product_name.value,
-      price: parseFloat(e.target.price.value),
-      stock: parseInt(e.target.stock.value, 10),
-      description: e.target.description.value,
-      category_id: e.target.category_id.value,
-      photo: e.target.photo.files[0] || editingProduct.photo,
-    };
+    const formData = new FormData();
+    formData.append("product_name", e.target.product_name.value);
+    formData.append("price", parseFloat(e.target.price.value));
+    formData.append("stock", parseInt(e.target.stock.value, 10));
+    formData.append("description", e.target.description.value);
+    formData.append("category_id", e.target.category_id.value);
+
+    // Handle the photo file
+    if (e.target.photo.files[0]) {
+      formData.append("photo", e.target.photo.files[0]);
+    } else if (editingProduct.photo) {
+      // If no new photo selected, append the existing photo URL
+      formData.append("photo", editingProduct.photo);
+    }
 
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
 
-      const response = await api.put(`/products/${editingProduct.id}`, updatedProduct, {
+      const response = await api.put(`/products/${editingProduct.id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
 
+      Swal.fire("Updated!", "Product has been updated successfully.", "success");
       setProducts(products.map((product) => (product.id === editingProduct.id ? response.data.data : product)));
       setEditingProduct(null);
     } catch (error) {
@@ -113,7 +133,7 @@ const MyProductCard = () => {
   };
 
   return (
-    <div className="w-3/4 p-8">
+    <div className="w-3/4 p-8 mt-16">
       <div className="bg-white rounded-md border shadow-md p-6 mb-8 h-screen">
         <h2 className="text-lg font-semibold mb-4">My Products</h2>
         <div className="flex mb-4">
@@ -136,20 +156,20 @@ const MyProductCard = () => {
           </div>
         </div>
 
-        <div className="w-full max-h-80 overflow-y-auto shadow-md rounded-lg border border-gray-200">
-          <table className="w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+        <div className="w-full bg-white pb-4 rounded-lg border border-gray-200">
+          <table className="w-full overflow-x-auto text-gray-700">
+            <thead className="bg-gray-100 border-b">
+              <tr className="text-left text-sm font-semibold text-gray-600 uppercase">
+                <th scope="col" className="text-center px-6 py-3">
                   Product Name
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="text-center px-6 py-3">
                   Price
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="text-center px-6 py-3">
                   Stock
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="text-center px-6 py-3">
                   Actions
                 </th>
               </tr>
@@ -164,16 +184,16 @@ const MyProductCard = () => {
                 </tr>
               ) : (
                 paginatedProducts.map((product) => (
-                  <tr key={product.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{product.product_name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{product.price}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{product.stock}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button onClick={() => setEditingProduct(product)} className="bg-blue-500 text-white px-4 py-2 rounded-md focus:outline-none hover:bg-primary-dark">
-                        <FaPencil />
+                  <tr key={product.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-center whitespace-nowrap text-sm font-medium text-gray-900">{product.product_name}</td>
+                    <td className=" text-center whitespace-nowrap text-sm text-gray-500">{formatCurrency(product.price)}</td>
+                    <td className=" text-center whitespace-nowrap text-sm text-gray-500">{product.stock}</td>
+                    <td className=" text-center whitespace-nowrap text-sm font-medium">
+                      <button onClick={() => setEditingProduct(product)} className="text-green-500 hover:text-green-700">
+                        <HiPencilAlt className="w-6 h-6 mr-2" />
                       </button>
-                      <button onClick={() => handleDelete(product.id)} className="bg-red-500 text-white px-4 py-2 rounded-md focus:outline-none hover:bg-red-600 ml-2">
-                        <FaTrash />
+                      <button onClick={() => handleDelete(product.id)} className="text-red-500 hover:text-red-700">
+                        <HiTrash className="w-6 h-6" />
                       </button>
                     </td>
                   </tr>
@@ -187,7 +207,7 @@ const MyProductCard = () => {
         <div className="flex justify-between items-center mt-4">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            className={`px-4 py-2 rounded-md focus:outline-none ${currentPage === 1 ? "bg-gray-400 text-white cursor-not-allowed" : "bg-primary text-white hover:bg-primary-dark"}`}
+            className={`px-4 py-2 rounded-md focus:outline-none ${currentPage === 1 ? "bg-gray-400 text-white cursor-not-allowed" : "bg-primary text-white hover:bg-hoverPrimary"}`}
             disabled={currentPage === 1}
           >
             Previous
@@ -196,8 +216,8 @@ const MyProductCard = () => {
             Page {currentPage} of {totalPages}
           </span>
           <button
+            className={`px-4 py-2 rounded-md focus:outline-none ${currentPage === totalPages ? "bg-gray-400 text-white cursor-not-allowed" : "bg-primary text-white hover:bg-hoverPrimary"}`}
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            className={`px-4 py-2 rounded-md focus:outline-none ${currentPage === totalPages ? "bg-gray-400 text-white cursor-not-allowed" : "bg-primary text-white hover:bg-primary-dark"}`}
             disabled={currentPage === totalPages}
           >
             Next
@@ -207,82 +227,51 @@ const MyProductCard = () => {
 
       {/* Edit Product Modal */}
       {editingProduct && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-          <div className="bg-white p-6 rounded-md shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Edit Product</h3>
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 w-1/2">
+            <h2 className="text-lg font-semibold mb-4">Edit Product</h2>
             <form onSubmit={handleUpdate}>
-              <div className="mb-4">
-                <label htmlFor="product_name" className="block text-sm font-medium text-gray-700">
-                  Product Name
-                </label>
-                <input
-                  id="product_name"
-                  name="product_name"
-                  type="text"
-                  defaultValue={editingProduct.product_name}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-                  Price
-                </label>
-                <input
-                  id="price"
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  defaultValue={editingProduct.price}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="stock" className="block text-sm font-medium text-gray-700">
-                  Stock
-                </label>
-                <input
-                  id="stock"
-                  name="stock"
-                  type="number"
-                  defaultValue={editingProduct.stock}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  defaultValue={editingProduct.description}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="category_id" className="block text-sm font-medium text-gray-700">
-                  Category
-                </label>
-                <input
-                  id="category_id"
-                  name="category_id"
-                  type="text"
-                  defaultValue={editingProduct.category_id}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="photo" className="block text-sm font-medium text-gray-700">
-                  Photo
-                </label>
-                <input id="photo" name="photo" type="file" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="col-span-2 sm:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700">Product Name</label>
+                  <input type="text" name="product_name" defaultValue={editingProduct.product_name} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary" />
+                </div>
+                <div className="col-span-2 sm:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700">Price</label>
+                  <input type="text" name="price" defaultValue={editingProduct.price} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary" />
+                </div>
+                <div className="col-span-2 sm:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700">Stock</label>
+                  <input type="text" name="stock" defaultValue={editingProduct.stock} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary" />
+                </div>
+                <div className="col-span-2 sm:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700">Category</label>
+                  <select name="category_id" defaultValue={editingProduct.category_id} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">Description</label>
+                  <textarea name="description" defaultValue={editingProduct.description} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"></textarea>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">Photo</label>
+                  <div className="flex items-center space-x-4">
+                    {editingProduct.photo && <img src={editingProduct.photo} alt="Current photo" className="w-32 h-32 object-cover border border-gray-300 rounded-lg" />}
+                    <input type="file" name="photo" accept="image/*" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary" />
+                  </div>
+                </div>
               </div>
               <div className="flex justify-end">
-                <button type="button" onClick={() => setEditingProduct(null)} className="bg-gray-500 text-white px-4 py-2 rounded-md focus:outline-none hover:bg-gray-600 mr-2">
-                  Cancel
-                </button>
                 <button type="submit" className="bg-primary text-white px-4 py-2 rounded-md focus:outline-none hover:bg-primary-dark">
-                  Save
+                  Update
+                </button>
+                <button onClick={() => setEditingProduct(null)} className="ml-4 bg-gray-500 text-white px-4 py-2 rounded-md focus:outline-none hover:bg-gray-600">
+                  Cancel
                 </button>
               </div>
             </form>

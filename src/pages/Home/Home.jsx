@@ -154,7 +154,7 @@ function Home() {
 
   return (
     <>
-      <div className="w-4/5 container mx-auto mt-10">
+      <div className="w-4/5 container mx-auto mt-28">
         <div className="slider-container">
           <Slider {...bannerSettings}>
             {sliderData.map((slider) => (

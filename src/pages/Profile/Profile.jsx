@@ -7,7 +7,7 @@ function Profile() {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col lg:flex-row bg-[#F5F5F5] pt-1 min-h-screen">
+      <div className="flex pt-1">
         <SidebarCustomer />
         <ProfileCard />
       </div>

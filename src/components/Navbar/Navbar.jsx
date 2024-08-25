@@ -1,5 +1,6 @@
-import { FaSearch, FaShoppingCart, FaBell, FaEnvelope, FaUser, FaSignOutAlt, FaBars, FaHome } from "react-icons/fa";
-import { useEffect, useState, useRef } from "react";
+import { HiBell, HiHome, HiLogout, HiMail, HiOutlineMenu, HiSearch, HiShoppingCart, HiUser } from "react-icons/hi";
+import { useEffect, useState, useRef, Fragment } from "react";
+import { Popover, Transition } from "@headlessui/react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/img/logo/blanja.png";
 import Swal from "sweetalert2";
@@ -86,7 +87,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-white py-4 shadow-md ">
+      <nav className="bg-white py-4 shadow-md fixed top-0 left-0 right-0 z-50">
         <div className="flex justify-between items-center w-11/12 md:w-5/6 mx-auto">
           {/* Logo */}
           <Link to="/" className="flex items-center">
@@ -96,12 +97,12 @@ const Navbar = () => {
           {/* Search Input */}
           <div className="relative hidden md:block flex-grow mx-20">
             <input type="text" placeholder="Search..." className="bg-white border px-4 py-2 rounded-full text-gray-700 focus:outline-none w-full pr-12" />
-            <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 cursor-pointer hover:text-black" />
+            <HiSearch size={22} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 cursor-pointer hover:text-black" />
           </div>
 
           {/* Mobile Menu Button */}
           <button className="md:hidden" onClick={toggleDropdown}>
-            <FaBars className="text-gray-500" />
+            <HiOutlineMenu className="text-gray-500 text-2xl" />
           </button>
 
           {/* Menu for logged in user */}
@@ -111,27 +112,115 @@ const Navbar = () => {
               {userRole === "customer" && (
                 <>
                   <Link to="/mybag" className="text-slate-500 relative cursor-pointer hover:text-black">
-                    <FaShoppingCart className="text-2xl" />
+                    <HiShoppingCart className="text-2xl" />
 
                     {/* Notification Badge */}
                     {myBag.myBag.length > 0 && <div className="absolute -top-3 -right-3   bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold">{myBag.myBag.length}</div>}
                   </Link>
-                  <Link to="/notification" className="text-slate-500 cursor-pointer hover:text-black">
-                    <FaBell className="text-2xl" />
-                  </Link>
-                  <Link to="/message" className="text-slate-500 cursor-pointer hover:text-black">
-                    <FaEnvelope className="text-2xl" />
-                  </Link>
+                  <Popover className="relative">
+                    {({ open }) => (
+                      <>
+                        <Popover.Button className={`group inline-flex items-center rounded-sm p-1.5 text-gray-700 hover:text-opacity-100 ${open ? "bg-gray-100" : ""}`}>
+                          <HiBell className="text-2xl" />
+                        </Popover.Button>
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-200"
+                          enterFrom="opacity-0 translate-y-1"
+                          enterTo="opacity-100 translate-y-0"
+                          leave="transition ease-in duration-150"
+                          leaveFrom="opacity-100 translate-y-0"
+                          leaveTo="opacity-0 translate-y-1"
+                        >
+                          <Popover.Panel className="absolute right-0 z-10 mt-2.5 transform w-80">
+                            <div className="bg-white rounded-sm shadow-md ring-1 ring-black ring-opacity-5 px-2 py-2.5">
+                              <strong className="text-gray-700 font-medium">Notifications</strong>
+                              <div className="mt-2 py-1 text-sm">This is notifications panel.</div>
+                            </div>
+                          </Popover.Panel>
+                        </Transition>
+                      </>
+                    )}
+                  </Popover>
+                  <Popover className="relative">
+                    {({ open }) => (
+                      <>
+                        <Popover.Button className={`group inline-flex items-center rounded-sm p-1.5 text-gray-700 hover:text-opacity-100 ${open ? "bg-gray-100" : ""}`}>
+                          <HiMail className="text-2xl" />
+                        </Popover.Button>
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-200"
+                          enterFrom="opacity-0 translate-y-1"
+                          enterTo="opacity-100 translate-y-0"
+                          leave="transition ease-in duration-150"
+                          leaveFrom="opacity-100 translate-y-0"
+                          leaveTo="opacity-0 translate-y-1"
+                        >
+                          <Popover.Panel className="absolute right-0 z-10 mt-2.5 transform w-80">
+                            <div className="bg-white rounded-sm shadow-md ring-1 ring-black ring-opacity-5 px-2 py-2.5">
+                              <strong className="text-gray-700 font-medium">Messages</strong>
+                              <div className="mt-2 py-1 text-sm">This is messages panel.</div>
+                            </div>
+                          </Popover.Panel>
+                        </Transition>
+                      </>
+                    )}
+                  </Popover>
                 </>
-              )}{" "}
+              )}
               {userRole === "seller" && (
                 <>
-                  <Link to="/notification" className="text-slate-500 cursor-pointer hover:text-black">
-                    <FaBell className="text-2xl" />
-                  </Link>
-                  <Link to="/message" className="text-slate-500 cursor-pointer hover:text-black">
-                    <FaEnvelope className="text-2xl" />
-                  </Link>
+                  <Popover className="relative">
+                    {({ open }) => (
+                      <>
+                        <Popover.Button className={`group inline-flex items-center rounded-sm p-1.5 text-gray-700 hover:text-opacity-100 ${open ? "bg-gray-100" : ""}`}>
+                          <HiBell className="text-2xl" />
+                        </Popover.Button>
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-200"
+                          enterFrom="opacity-0 translate-y-1"
+                          enterTo="opacity-100 translate-y-0"
+                          leave="transition ease-in duration-150"
+                          leaveFrom="opacity-100 translate-y-0"
+                          leaveTo="opacity-0 translate-y-1"
+                        >
+                          <Popover.Panel className="absolute right-0 z-10 mt-2.5 transform w-80">
+                            <div className="bg-white rounded-sm shadow-md ring-1 ring-black ring-opacity-5 px-2 py-2.5">
+                              <strong className="text-gray-700 font-medium">Notifications</strong>
+                              <div className="mt-2 py-1 text-sm">This is notifications panel.</div>
+                            </div>
+                          </Popover.Panel>
+                        </Transition>
+                      </>
+                    )}
+                  </Popover>
+                  <Popover className="relative">
+                    {({ open }) => (
+                      <>
+                        <Popover.Button className={`group inline-flex items-center rounded-sm p-1.5 text-gray-700 hover:text-opacity-100 ${open ? "bg-gray-100" : ""}`}>
+                          <HiMail className="text-2xl" />
+                        </Popover.Button>
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-200"
+                          enterFrom="opacity-0 translate-y-1"
+                          enterTo="opacity-100 translate-y-0"
+                          leave="transition ease-in duration-150"
+                          leaveFrom="opacity-100 translate-y-0"
+                          leaveTo="opacity-0 translate-y-1"
+                        >
+                          <Popover.Panel className="absolute right-0 z-10 mt-2.5 transform w-80">
+                            <div className="bg-white rounded-sm shadow-md ring-1 ring-black ring-opacity-5 px-2 py-2.5">
+                              <strong className="text-gray-700 font-medium">Messages</strong>
+                              <div className="mt-2 py-1 text-sm">This is messages panel.</div>
+                            </div>
+                          </Popover.Panel>
+                        </Transition>
+                      </>
+                    )}
+                  </Popover>
                 </>
               )}
               {/* Dropdown for user profile */}
@@ -139,7 +228,7 @@ const Navbar = () => {
                 {profileImage ? (
                   <img src={profileImage} alt="Profile" className="w-7 h-7 rounded-full object-cover cursor-pointer" onClick={handleProfileClick} />
                 ) : (
-                  <FaUser className="text-slate-500 text-2xl hover:text-black cursor-pointer" onClick={handleProfileClick} />
+                  <HiUser className="text-slate-500 text-2xl hover:text-black cursor-pointer" onClick={handleProfileClick} />
                 )}
                 {showDropdown && (
                   <div className="absolute top-8 right-0 bg-white shadow-md rounded-md z-10" onClick={closeDropdown}>
@@ -148,7 +237,7 @@ const Navbar = () => {
                         {userRole === "customer" && (
                           <Link to="/profile" className="block text-gray-700 hover:text-black">
                             <span className="flex items-center space-x-2">
-                              <FaUser className="text-slate-500 cursor-pointer hover:text-black" />
+                              <HiUser className="text-slate-500 cursor-pointer hover:text-black" />
                               <span>Profile</span>
                             </span>
                           </Link>
@@ -156,7 +245,7 @@ const Navbar = () => {
                         {userRole === "seller" && (
                           <Link to="/profile-seller" className="block text-gray-700 hover:text-black">
                             <span className="flex items-center space-x-2">
-                              <FaUser className="text-slate-500 cursor-pointer hover:text-black" />
+                              <HiUser className="text-slate-500 cursor-pointer hover:text-black" />
                               <span>Profile</span>
                             </span>
                           </Link>
@@ -166,7 +255,7 @@ const Navbar = () => {
                       <li className="px-4 py-2 hover:bg-gray-100">
                         <Link to="#" onClick={handleLogout} className="block text-gray-700 hover:text-black">
                           <span className="flex items-center space-x-2">
-                            <FaSignOutAlt className="text-slate-500 cursor-pointer hover:text-black" />
+                            <HiLogout className="text-slate-500 cursor-pointer hover:text-black" />
                             <span>Logout</span>
                           </span>
                         </Link>
@@ -195,7 +284,7 @@ const Navbar = () => {
                 <li className="md:ml-8 mr-6 text-xl md:my-0 my-7">
                   <div className="relative">
                     <input type="text" placeholder="Search..." className="bg-white border px-4 py-2 rounded-full text-gray-700 focus:outline-none w-full pr-12" />
-                    <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 cursor-pointer hover:text-black text-2xl md:text-xl lg:text-lg" />
+                    <HiSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 cursor-pointer hover:text-black text-2xl md:text-xl lg:text-lg" />
                   </div>
                 </li>
 
@@ -204,33 +293,33 @@ const Navbar = () => {
                   <>
                     <li className="md:ml-8 text-xl md:my-0 my-7">
                       <Link to="/" className="text-gray-700 flex items-center hover:text-black">
-                        <FaHome className="text-gray-500 mr-2" />
+                        <HiHome className="text-gray-500 mr-2" />
                         <span className="hover:text-black">Home</span>
                       </Link>
                     </li>
                     <li className="md:ml-8 text-xl md:my-0 my-7">
                       <Link to="/mybag" className="text-gray-700 flex items-center hover:text-black">
-                        <FaShoppingCart className="text-gray-500 mr-2" />
+                        <HiShoppingCart className="text-gray-500 mr-2" />
                         {myBag.myBag.length > 0 && <div className="relative -top-3 right-2 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold">{myBag.myBag.length}</div>}
                         <span className="hover:text-black">Cart</span>
                       </Link>
                     </li>
                     <li className="md:ml-8 text-xl md:my-0 my-7">
                       <Link to="/notification" className="text-gray-700 flex items-center hover:text-black">
-                        <FaBell className="text-gray-500 mr-2" />
+                        <HiBell className="text-gray-500 mr-2" />
                         <span className="hover:text-black">Notification</span>
                       </Link>
                     </li>
                     <li className="md:ml-8 text-xl md:my-0 my-7">
                       <Link to="/message" className="text-gray-700 flex items-center hover:text-black">
-                        <FaEnvelope className="text-gray-500 mr-2" />
+                        <HiMail className="text-gray-500 mr-2" />
                         <span className="hover:text-black">Message</span>
                       </Link>
                     </li>
                     {userRole === "customer" && (
                       <li className="md:ml-8 text-xl md:my-0 my-7">
                         <Link to="/profile" className="text-gray-700 flex items-center hover:text-black">
-                          <FaUser className="text-gray-500 mr-2" />
+                          <HiUser className="text-gray-500 mr-2" />
                           <span className="hover:text-black">Profile</span>
                         </Link>
                       </li>
@@ -238,14 +327,14 @@ const Navbar = () => {
                     {userRole === "seller" && (
                       <li className="md:ml-8 text-xl md:my-0 my-7">
                         <Link to="/profile-seller" className="text-gray-700 flex items-center hover:text-black">
-                          <FaUser className="text-gray-500 mr-2" />
+                          <HiUser className="text-gray-500 mr-2" />
                           <span className="hover:text-black">Profile</span>
                         </Link>
                       </li>
                     )}
                     <li className="md:ml-8 text-xl md:my-0 my-7">
                       <Link to={handleLogout} className="text-gray-700 flex items-center hover:text-black">
-                        <FaSignOutAlt className="text-gray-500 mr-2" />
+                        <HiLogout className="text-gray-500 mr-2" />
                         <span className="hover:text-black">Logout</span>
                       </Link>
                     </li>

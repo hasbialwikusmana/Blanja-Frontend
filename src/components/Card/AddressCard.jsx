@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import Modal from "react-modal";
 import api from "../../services/Api";
 import AddAddress from "./AddAddress";
@@ -14,6 +13,7 @@ function AddressCard() {
   });
 
   const [address, setAddress] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAddress = async () => {
@@ -29,7 +29,12 @@ function AddressCard() {
 
         setAddress(response.data.data);
       } catch (error) {
-        console.error("Error fetching addresses:", error);
+        if (error.response && error.response.status === 404) {
+          setAddress([]);
+        } else {
+          console.error("Error fetching addresses:", error);
+          setError("Failed to fetch addresses. Please try again later.");
+        }
       }
     };
 
@@ -66,18 +71,16 @@ function AddressCard() {
       Swal.fire("Error!", "There was an error deleting the address.", "error");
     }
   };
-  const handleSave = () => {
-    setOpenAddModal((prev) => ({ ...prev, isShown: false }));
-    setOpenAddModal((prev) => ({ ...prev, type: "add", data: null }));
-    setOpenAddModal((prev) => ({ ...prev, type: "edit", data: null }));
 
+  const handleSave = () => {
+    setOpenAddModal({ isShown: false, type: "add", data: null });
     window.location.reload();
   };
 
   return (
     <>
-      <div className="w-3/4 p-8">
-        <div className="bg-white rounded-md border shadow-md p-6 mb-8 h-screen">
+      <div className="w-3/4 p-8 mt-16">
+        <div className="bg-white rounded-md border shadow-md p-6 mb-8">
           <h2 className="text-lg font-semibold mb-4">Choose Another Address</h2>
           <p className="text-sm text-gray-600 mb-4">Manage your shipping address</p>
           <hr className="mb-4" />
@@ -96,10 +99,13 @@ function AddressCard() {
               },
             }}
             contentLabel=""
-            className="w-[50%] max-h-3/4 bg-white rounded-md mx-auto mt-14 p-5"
+            className="w-[50%] max-h-3/4 bg-white rounded-md mx-auto mt-28 p-5"
           >
             <AddAddress type={openAddModal.type} addressData={openAddModal.data} onSave={handleSave} onClose={() => setOpenAddModal({ isShown: false, type: "add", data: null })} />
           </Modal>
+
+          {/* Error Message */}
+          {error && <p className="text-red-500 mb-4">{error}</p>}
 
           {/* Card for Displaying Address Data */}
           <div className="max-h-[400px] overflow-y-auto">

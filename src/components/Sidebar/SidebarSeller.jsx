@@ -77,78 +77,81 @@ function SidebarSeller() {
   };
 
   return (
-    <div className="w-2/5 bg-white shadow-md min-h-screen">
+    <div className="w-2/5 top-16 left-0 bg-white shadow-md mt-16">
       <div className="mt-8 flex flex-col items-center">
         {/* Profile Image and Name */}
-        <div className="flex items-center mb-10 ml-14">
-          <img src={profileImage || profile} alt="Profile Image" className="w-20 h-20 rounded-full mr-2" />
-          <div>
-            <h1 className="text-xl font-bold mb-1">{name}</h1>
-            <a href="#" className="flex items-center text-gray-400 text-left">
+        <div className="flex items-center mb-12 ml-16">
+          <img src={profileImage || profile} alt="Profile Image" className="w-24 h-24 rounded-full mr-4 shadow-lg object-cover" />
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-semibold mb-2 text-gray-900">{name}</h1>
+            <div className="flex items-center text-gray-400">
               <FaPencil className="mr-2" /> Edit Profile
-            </a>
+            </div>
           </div>
         </div>
+
         {/* Sidebar Navigation */}
-        <ul>
+        <ul className="w-full lg:w-1/2 px-4 lg:px-0">
           {/* Store */}
-          <li className="relative" style={{ marginBottom: isStoreDropdownOpen ? "30px" : "0" }}>
-            <div className="flex items-center justify-between py-4 px-6 cursor-pointer" onClick={toggleStoreDropdown}>
+          <li className="relative mb-2">
+            <div className="flex items-center justify-between py-3 px-6 cursor-pointer bg-white hover:bg-gray-50 rounded-md shadow-sm" onClick={toggleStoreDropdown}>
               <div className="flex items-center">
-                <div className="bg-blue-500 rounded-full p-1 mr-2">
-                  <FaHome className="text-white" size={22} />
+                <div className="bg-blue-500 rounded-full p-2 mr-3">
+                  <FaHome className="text-white" size={20} />
                 </div>
-                <span className={`font-semibold ${location.pathname === "/profile-seller" ? "text-[#222222]" : "text-[#9B9B9B]"} hover:text-[#222222] mr-24`}>Store</span>
+                <span className={`font-semibold transition-colors duration-200 ${location.pathname === "/profile-seller" ? "text-gray-800" : "text-gray-500"} hover:text-gray-800`}>Store</span>
               </div>
-              <FaAngleDown className="w-4 h-4 text-gray-500 transition-transform transform" style={{ transform: isStoreDropdownOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
+              <FaAngleDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isStoreDropdownOpen ? "rotate-180" : "rotate-0"}`} />
             </div>
-            {/* Dropdown untuk Store */}
+            {/* Dropdown for Store */}
             {isStoreDropdownOpen && (
-              <div className="absolute ml-10 -mt-2 z-10">
-                <NavLink to="/profile-seller" className={`block py-2 px-6 text-sm hover:bg-gray-100 ${location.pathname === "/profile-seller" ? "text-black font-medium" : "text-gray-800"}`}>
+              <div className="mt-2 pl-10">
+                <NavLink to="/profile-seller" className={`block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-gray-100 ${location.pathname === "/profile-seller" ? "text-gray-900 font-medium" : "text-gray-700"}`}>
                   Store Profile
                 </NavLink>
               </div>
             )}
           </li>
+
           {/* Product */}
-          <li className="relative" style={{ marginBottom: isProductDropdownOpen ? "60px" : "0" }}>
-            <div className="flex items-center justify-between py-4 px-6 cursor-pointer" onClick={toggleProductDropdown}>
+          <li className="relative mb-2">
+            <div className="flex items-center justify-between py-3 px-6 cursor-pointer bg-white hover:bg-gray-50 rounded-md shadow-sm" onClick={toggleProductDropdown}>
               <div className="flex items-center">
-                <div className="bg-[#F36F45] rounded-full p-1 mr-2">
-                  <FaBox className="text-white" size={22} />
+                <div className="bg-[#F36F45] rounded-full p-2 mr-3">
+                  <FaBox className="text-white" size={20} />
                 </div>
-                <span className={`font-semibold ${location.pathname === "/my-products" || location.pathname === "/selling-products" ? "text-[#222222]" : "text-[#9B9B9B]"} hover:text-[#222222]`}>Product</span>
+                <span className={`font-semibold transition-colors duration-200 ${location.pathname === "/my-products" || location.pathname === "/selling-products" ? "text-gray-800" : "text-gray-500"} hover:text-gray-800`}>Product</span>
               </div>
-              <FaAngleDown className="w-4 h-4 text-gray-500 transition-transform transform" style={{ transform: isProductDropdownOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
+              <FaAngleDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isProductDropdownOpen ? "rotate-180" : "rotate-0"}`} />
             </div>
-            {/* Dropdown untuk Product */}
+            {/* Dropdown for Product */}
             {isProductDropdownOpen && (
-              <div className="absolute ml-10 -mt-2 z-10">
-                <NavLink to="/my-products" className={`block py-2 px-6 text-sm hover:bg-gray-100 ${location.pathname === "/my-products" ? "text-black font-medium" : "text-gray-800"}`}>
+              <div className="mt-2 pl-10 space-y-1">
+                <NavLink to="/my-products" className={`block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-gray-100 ${location.pathname === "/my-products" ? "text-gray-900 font-medium" : "text-gray-700"}`}>
                   My Products
                 </NavLink>
-                <NavLink to="/selling-products" className={`block py-2 px-6 text-sm hover:bg-gray-100 ${location.pathname === "/selling-products" ? "text-black font-medium" : "text-gray-800"}`}>
+                <NavLink to="/selling-products" className={`block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-gray-100 ${location.pathname === "/selling-products" ? "text-gray-900 font-medium" : "text-gray-700"}`}>
                   Selling Products
                 </NavLink>
               </div>
             )}
           </li>
+
           {/* Order */}
-          <li className="relative" style={{ marginBottom: isOrderDropdownOpen ? "60px" : "0" }}>
-            <div className="flex items-center justify-between py-4 px-6 cursor-pointer" onClick={toggleOrderDropdown}>
+          <li className="relative mb-2">
+            <div className="flex items-center justify-between py-3 px-6 cursor-pointer bg-white hover:bg-gray-50 rounded-md shadow-sm" onClick={toggleOrderDropdown}>
               <div className="flex items-center">
-                <div className="bg-[#F3456F] rounded-full p-1 mr-2">
-                  <FaShoppingCart className="text-white" size={22} />
+                <div className="bg-[#F3456F] rounded-full p-2 mr-3">
+                  <FaShoppingCart className="text-white" size={20} />
                 </div>
-                <span className={`font-semibold ${location.pathname === "/my-orders" ? "text-[#222222]" : "text-[#9B9B9B]"} hover:text-[#222222]`}>Order</span>
+                <span className={`font-semibold transition-colors duration-200 ${location.pathname === "/my-orders" ? "text-gray-800" : "text-gray-500"} hover:text-gray-800`}>Order</span>
               </div>
-              <FaAngleDown className="w-4 h-4 text-gray-500 transition-transform transform" style={{ transform: isOrderDropdownOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
+              <FaAngleDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOrderDropdownOpen ? "rotate-180" : "rotate-0"}`} />
             </div>
-            {/* Dropdown untuk Order */}
+            {/* Dropdown for Order */}
             {isOrderDropdownOpen && (
-              <div className="absolute ml-10 -mt-2 z-10">
-                <NavLink to="/my-orders" className={`block py-2 px-6 text-sm hover:bg-gray-100 ${location.pathname === "/my-orders" ? "text-black font-medium" : "text-gray-800"}`}>
+              <div className="mt-2 pl-10">
+                <NavLink to="/my-orders" className={`block py-2 px-4 rounded-md transition-colors duration-200 hover:bg-gray-100 ${location.pathname === "/my-orders" ? "text-gray-900 font-medium" : "text-gray-700"}`}>
                   My Order
                 </NavLink>
               </div>
