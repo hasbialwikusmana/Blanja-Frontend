@@ -64,7 +64,7 @@ git clone https://github.com/hasbialwikusmana/Blanja-Frontend.git
 - Go To Folder Repo
 
 ```
-cd HireJob-Frontend
+cd Blanja-Frontend
 ```
 
 - Install Module
