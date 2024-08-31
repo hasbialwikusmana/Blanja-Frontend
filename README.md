@@ -265,7 +265,7 @@ VITE_API_URL = "YOUR_API_URL"
 
 ## Contact
 
-Email : [hasbialwi70@gmail.com](mailto:hasbialwi70@gmail.com)
+My Email : [hasbialwi70@gmail.com](mailto:hasbialwi70@gmail.com)
 
 Project Link : [https://github.com/hasbialwikusmana/Blanja-Frontend](https://github.com/hasbialwikusmana/Blanja-Frontend)
 
