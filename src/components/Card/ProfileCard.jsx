@@ -152,7 +152,7 @@ function ProfileCard() {
 
                 <div className="mb-4">
                   <label className="text-[#9B9B9B] mr-2">Email</label>
-                  <input type="text" name="email" className="border border-gray-300 rounded-md py-2 px-3 w-full focus:outline-none focus:border-primary" value={formData.email} />
+                  <input type="text" name="email" className="border border-gray-300 rounded-md py-2 px-3 w-full focus:outline-none focus:border-primary" value={formData.email} onChange={handleInputChange} />
                 </div>
 
                 <div className="mb-4">
